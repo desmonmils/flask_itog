@@ -11,10 +11,11 @@ def build_fucking_graph():
     data = request.get_json(force=True)
     get_pred = data.get("flag", None)
     data = data["data"]
+    print(data)
     print(get_pred)
     try:
         df = pd.DataFrame(data)
-
+        print('df', df)
         nodes = {}
         edges = {}
         layouts = {}
@@ -42,9 +43,26 @@ def build_fucking_graph():
             f2 = row["f2"]
             f2_n = node_to_num[f2]
 
-            edges[f"edge{edge_counter}"] = {"source": f"node{f1_n}",
+            if row["f3"] not in unique_nodes:
+                unique_nodes.append(row["f3"])
+                node_to_num[row["f3"]] = len(unique_nodes)
+                nodes[f"node{node_to_num[row['f3']]}"] = {"name": row["f3"]}
+                layouts[f"node{node_to_num[row['f3']]}"] = {"x": node_to_num[row['f3']],
+                                                            "y": node_to_num[row['f3']]}
+
+            f3 = row["f3"]
+            f3_n = node_to_num[f3]
+
+            edges[f"edge{edge_counter}"] = {"source": f"node{f3_n}",
                                             "target": f"node{f2_n}",
                                             "label": row["r"]}
+
+            edge_counter += 1
+
+            edges[f"edge{edge_counter}"] = {"source": f"node{f3_n}",
+                                            "target": f"node{f1_n}",
+                                            "label": row["r"]}
+            
             edge_counter += 1
 
         if not get_pred:
